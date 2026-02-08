@@ -52,19 +52,20 @@ class DeepgramTranscriptionService {
         
         // Add language parameter if not auto-detect
         let selectedLanguage = UserDefaults.standard.string(forKey: "SelectedLanguage") ?? "auto"
-        
+        let apiLanguage = LanguageCodeMapper.apiLanguageCode(selectedLanguage)
+
         // Choose model based on language
-        let modelName = selectedLanguage == "en" ? "nova-3" : "nova-2"
+        let modelName = apiLanguage == "en" ? "nova-3" : "nova-2"
         queryItems.append(URLQueryItem(name: "model", value: modelName))
-        
+
         queryItems.append(contentsOf: [
             URLQueryItem(name: "smart_format", value: "true"),
             URLQueryItem(name: "punctuate", value: "true"),
             URLQueryItem(name: "paragraphs", value: "true")
         ])
-        
-        if selectedLanguage != "auto" && !selectedLanguage.isEmpty {
-            queryItems.append(URLQueryItem(name: "language", value: selectedLanguage))
+
+        if apiLanguage != "auto" && !apiLanguage.isEmpty {
+            queryItems.append(URLQueryItem(name: "language", value: apiLanguage))
         }
         
         components.queryItems = queryItems

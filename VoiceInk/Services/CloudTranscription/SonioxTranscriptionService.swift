@@ -78,8 +78,9 @@ class SonioxTranscriptionService {
             ]
         }
         let selectedLanguage = UserDefaults.standard.string(forKey: "SelectedLanguage") ?? "auto"
-        if selectedLanguage != "auto" && !selectedLanguage.isEmpty {
-            payload["language_hints"] = [selectedLanguage]
+        let apiLanguage = LanguageCodeMapper.apiLanguageCode(selectedLanguage)
+        if apiLanguage != "auto" && !apiLanguage.isEmpty {
+            payload["language_hints"] = [apiLanguage]
         }
         request.httpBody = try JSONSerialization.data(withJSONObject: payload)
         let (data, response) = try await URLSession.shared.data(for: request)

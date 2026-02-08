@@ -52,8 +52,9 @@ class ElevenLabsTranscriptionService {
         body.append(formField: "tag_audio_events", value: "false", boundary: boundary)
         
         let selectedLanguage = UserDefaults.standard.string(forKey: "SelectedLanguage") ?? "auto"
-        if selectedLanguage != "auto", !selectedLanguage.isEmpty {
-            body.append(formField: "language_code", value: selectedLanguage, boundary: boundary)
+        let apiLanguage = LanguageCodeMapper.apiLanguageCode(selectedLanguage)
+        if apiLanguage != "auto", !apiLanguage.isEmpty {
+            body.append(formField: "language_code", value: apiLanguage, boundary: boundary)
         }
         
         body.append("--\(boundary)--\r\n".data(using: .utf8)!)

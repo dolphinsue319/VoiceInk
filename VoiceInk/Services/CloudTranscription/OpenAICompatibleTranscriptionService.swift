@@ -52,23 +52,24 @@ class OpenAICompatibleTranscriptionService {
         }
         
         let selectedLanguage = UserDefaults.standard.string(forKey: "SelectedLanguage") ?? "auto"
+        let apiLanguage = LanguageCodeMapper.apiLanguageCode(selectedLanguage)
         let prompt = UserDefaults.standard.string(forKey: "TranscriptionPrompt") ?? ""
-        
+
         body.append("--\(boundary)\(crlf)".data(using: .utf8)!)
         body.append("Content-Disposition: form-data; name=\"file\"; filename=\"\(audioURL.lastPathComponent)\"\(crlf)".data(using: .utf8)!)
         body.append("Content-Type: audio/wav\(crlf)\(crlf)".data(using: .utf8)!)
         body.append(audioData)
         body.append(crlf.data(using: .utf8)!)
-        
+
         body.append("--\(boundary)\(crlf)".data(using: .utf8)!)
         body.append("Content-Disposition: form-data; name=\"model\"\(crlf)\(crlf)".data(using: .utf8)!)
         body.append(modelName.data(using: .utf8)!)
         body.append(crlf.data(using: .utf8)!)
-        
-        if selectedLanguage != "auto", !selectedLanguage.isEmpty {
+
+        if apiLanguage != "auto", !apiLanguage.isEmpty {
             body.append("--\(boundary)\(crlf)".data(using: .utf8)!)
             body.append("Content-Disposition: form-data; name=\"language\"\(crlf)\(crlf)".data(using: .utf8)!)
-            body.append(selectedLanguage.data(using: .utf8)!)
+            body.append(apiLanguage.data(using: .utf8)!)
             body.append(crlf.data(using: .utf8)!)
         }
         

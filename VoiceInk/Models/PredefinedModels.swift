@@ -7,14 +7,14 @@ import Foundation
         } else {
             // For Apple Native models, return only supported languages in simple format
             if provider == .nativeApple {
-                let appleSupportedCodes = ["ar", "de", "en", "es", "fr", "it", "ja", "ko", "pt", "yue", "zh"]
+                let appleSupportedCodes = ["ar", "de", "en", "es", "fr", "it", "ja", "ko", "pt", "yue", "zh-Hans", "zh-Hant"]
                 return allLanguages.filter { appleSupportedCodes.contains($0.key) }
             }
             // For Soniox, return only the 60 languages supported by stt-async-v4
             if provider == .soniox {
                 let sonioxSupportedCodes = [
                     "af", "sq", "ar", "az", "eu", "be", "bn", "bs", "bg", "ca",
-                    "zh", "hr", "cs", "da", "nl", "en", "et", "fi", "fr", "gl",
+                    "zh-Hans", "zh-Hant", "hr", "cs", "da", "nl", "en", "et", "fi", "fr", "gl",
                     "de", "el", "gu", "he", "hi", "hu", "id", "it", "ja", "kn",
                     "kk", "ko", "lv", "lt", "mk", "ms", "ml", "mr", "no", "fa",
                     "pl", "pt", "pa", "ro", "ru", "sr", "sk", "sl", "es", "sw",
@@ -423,6 +423,7 @@ import Foundation
          "yi": "Yiddish",
          "yo": "Yoruba",
          "yue": "Cantonese",
-         "zh": "Chinese",
+         "zh-Hans": "Chinese (Simplified)",
+         "zh-Hant": "Chinese (Traditional)",
      ]
  }

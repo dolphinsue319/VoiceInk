@@ -24,7 +24,8 @@ class NativeAppleTranscriptionService: TranscriptionService {
             "ko": "ko-KR",
             "pt": "pt-BR",
             "yue": "yue-CN",
-            "zh": "zh-CN"
+            "zh-Hans": "zh-CN",
+            "zh-Hant": "zh-TW"
         ]
         return mapping[simpleCode] ?? "en-US"
     }
@@ -70,7 +71,8 @@ class NativeAppleTranscriptionService: TranscriptionService {
         let audioFile = try AVAudioFile(forReading: audioURL)
         
         // Get the user's selected language in simple format and convert to BCP-47 format
-        let selectedLanguage = UserDefaults.standard.string(forKey: "SelectedLanguage") ?? "en"
+        let rawLanguage = UserDefaults.standard.string(forKey: "SelectedLanguage") ?? "en"
+        let selectedLanguage = LanguageCodeMapper.modernLanguageCode(rawLanguage)
         let appleLocale = mapToAppleLocale(selectedLanguage)
         let locale = Locale(identifier: appleLocale)
 

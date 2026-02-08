@@ -106,9 +106,16 @@ class WhisperState: NSObject, ObservableObject {
     
     init(modelContext: ModelContext, enhancementService: AIEnhancementService? = nil) {
         self.modelContext = modelContext
-        let appSupportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("com.prakashjoshipax.VoiceInk")
-        
+        let fm = FileManager.default
+        let appSupportBase = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        let appSupportDirectory = appSupportBase.appendingPathComponent("com.kedia.Typeless")
+
+        // Migrate from old bundle ID path if new path doesn't exist yet
+        let oldAppSupport = appSupportBase.appendingPathComponent("com.prakashjoshipax.VoiceInk")
+        if fm.fileExists(atPath: oldAppSupport.path), !fm.fileExists(atPath: appSupportDirectory.path) {
+            try? fm.moveItem(at: oldAppSupport, to: appSupportDirectory)
+        }
+
         self.modelsDirectory = appSupportDirectory.appendingPathComponent("WhisperModels")
         self.recordingsDirectory = appSupportDirectory.appendingPathComponent("Recordings")
         

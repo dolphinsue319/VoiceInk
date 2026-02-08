@@ -7,9 +7,46 @@ final class KeychainService {
     static let shared = KeychainService()
 
     private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "KeychainService")
-    private let service = "com.prakashjoshipax.VoiceInk"
+    private let service = "com.kedia.Typeless"
+    private static let oldService = "com.prakashjoshipax.VoiceInk"
 
-    private init() {}
+    private init() {
+        migrateFromOldServiceIfNeeded()
+    }
+
+    /// One-time migration of keychain items from the old service identifier.
+    private func migrateFromOldServiceIfNeeded() {
+        let migrationKey = "keychainMigrationFromOldServiceDone"
+        guard !UserDefaults.standard.bool(forKey: migrationKey) else { return }
+        defer { UserDefaults.standard.set(true, forKey: migrationKey) }
+
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: Self.oldService,
+            kSecReturnAttributes as String: true,
+            kSecReturnData as String: true,
+            kSecMatchLimit as String: kSecMatchLimitAll
+        ]
+        var result: AnyObject?
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+        guard status == errSecSuccess, let items = result as? [[String: Any]] else { return }
+
+        for item in items {
+            guard let account = item[kSecAttrAccount as String] as? String,
+                  let data = item[kSecValueData as String] as? Data else { continue }
+            let syncable = (item[kSecAttrSynchronizable as String] as? Bool) ?? false
+            save(data: data, forKey: account, syncable: syncable)
+            // Delete old item
+            var deleteQuery: [String: Any] = [
+                kSecClass as String: kSecClassGenericPassword,
+                kSecAttrService as String: Self.oldService,
+                kSecAttrAccount as String: account
+            ]
+            if syncable { deleteQuery[kSecAttrSynchronizable as String] = kCFBooleanTrue }
+            SecItemDelete(deleteQuery as CFDictionary)
+        }
+        logger.info("Migrated keychain items from old service identifier")
+    }
 
     // MARK: - Public API
 

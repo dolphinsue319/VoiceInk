@@ -123,11 +123,27 @@ struct VoiceInkApp: App {
     
     // MARK: - Container Creation Helpers
     
+    private static func migrateAppSupportIfNeeded(to newURL: URL, logger: Logger) {
+        let oldURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("com.prakashjoshipax.VoiceInk", isDirectory: true)
+        let fm = FileManager.default
+        guard fm.fileExists(atPath: oldURL.path), !fm.fileExists(atPath: newURL.path) else { return }
+        do {
+            try fm.moveItem(at: oldURL, to: newURL)
+            logger.info("Migrated Application Support from old bundle ID path")
+        } catch {
+            logger.error("Failed to migrate Application Support: \(error.localizedDescription)")
+        }
+    }
+
     private static func createPersistentContainer(schema: Schema, logger: Logger) -> ModelContainer? {
         do {
             // Create app-specific Application Support directory URL
             let appSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-                .appendingPathComponent("com.prakashjoshipax.VoiceInk", isDirectory: true)
+                .appendingPathComponent("com.kedia.Typeless", isDirectory: true)
+
+            // Migrate data from old bundle ID if present
+            migrateAppSupportIfNeeded(to: appSupportURL, logger: logger)
 
             // Create the directory if it doesn't exist
             try? FileManager.default.createDirectory(at: appSupportURL, withIntermediateDirectories: true)
@@ -151,7 +167,7 @@ struct VoiceInkApp: App {
                 "dictionary",
                 schema: dictionarySchema,
                 url: dictionaryStoreURL,
-                cloudKitDatabase: .private("iCloud.com.prakashjoshipax.VoiceInk")
+                cloudKitDatabase: .private("iCloud.com.kedia.Typeless")
             )
 
             // Initialize container
